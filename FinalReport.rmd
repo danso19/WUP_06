@@ -66,13 +66,95 @@ rowPerc(table1)
 colPerc(table1)
 ```
 
-
+with this we can more accurately asses that almost 68% percent of whites approve the measure while only 53% percent of blacks do while only 44% of the other group does. and we see that the black group, more stronly oppose it while for the white group it is only around 32% dissaproval rate while 44% for the other and 53% for black.
 
 ## Inferential Results
 
 <!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+```
+
+The fisher tests tells us if there is a differnce of opinion and what that differnce of oppinion would be amongs the differential groups, with this information we can more accuratly categorize , as we are able to see that the majority of people overall are for capital punishment but also we are able to tell that a big majority almost 80% of the people who answered were white.
+
+
+```{r}
+fisherXY = function(x, y, confL = 0, printAll=FALSE){
+  # Inputs: 
+  #   x: factor variable, 2 levels
+  #   y: factor variable, n levels
+  # confL: confidence level, default = 0.95
+  #        print only those tables, results if p-value < (1-confL)
+  # printAll: overide the 'print only if p-value < (1-confL), and
+  #           print all tables and fisher test results
+  #
+  # Constraint:
+  #   x and y must be same length
+  #
+  # Outputs:
+  #   All 2x2 Fisher exact tests
+  
+  if(confL<0 || confL> 1){
+    print('error: confL must be between 0 and 1')
+    return(999)
+  }
+  
+  if(!is.factor(x)) x=as.factor(x)
+  if(!is.factor(y)) y=as.factor(y)
+  
+  fisherTable = as.matrix(table(x, y))
+  cat('\ncontingency table:\n')
+  print(fisherTable)
+  cat('\n***All 2X2 tests****\n\n')
+
+  # all 2x2 tests
+  levelsY = levels(y)
+  levelsX = levels(x)
+  
+  m = length(levelsX)
+  n = length(levelsY)
+  
+  confLevel = 0.95
+  if (confL !=0 ) confLevel=confL
+  
+  for (i in 1:(m-1))
+       for(j in ((i+1):m))
+          for (k in 1:(n-1))
+             for (l in ((k+1):n)) {
+                
+                 fisherIndexX = c(i,j)
+                 fisherIndexY = c(k,l)
+                 
+                 fTempTable = as.matrix(fisherTable[fisherIndexX,
+                                        fisherIndexY])
+                 
+                 fisherTest=fisher.test(fTempTable, conf.int = TRUE, 
+                              conf.level = confLevel)
+                 
+                 if((fisherTest$p.value < (1-confLevel) ) || printAll){
+                   
+                       print(c(levelsX[i], levelsX[j]))
+                       print(c(levelsY[k], levelsY[l]))
+                       print(fTempTable)
+                       print(fisherTest)
+                       cat('\n')
+                 }
+                 
+        }
+}
+
+```
+
+```{r}
+fisherXY(GSS$cappun,GSS$race)
+```
+
 
 # Discussion and Conclusion
 
 <!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+
+The conclusion we can come to is to reject the null hypothesis, and from the infromation we had, we can clearly see that more og those in the white group had answered and not so much of the others or black group and from this we can see how they oppose it or favor it as 1058 whites favor while 511 oppose of that same group and for the others 138 favor and 109 oppose while for the black group 162 favor while 138 oppose.
+
